@@ -6,7 +6,17 @@ const mongoose = require("mongoose"); // ✅ FIX ADDED
 
 const app = express();
 
-app.use(cors());
+const cors = require("cors");
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // local dev
+      "https://appu677777-ux-catering-management.vercel.app" // your frontend
+    ],
+    credentials: true
+  })
+);
 app.use(express.json());
 
 // Test route
