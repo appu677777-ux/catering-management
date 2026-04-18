@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://catering-management-1.onrender.com"
+  baseURL: "https://catering-management-1.onrender.com/api"
 });
 
 // attach token
