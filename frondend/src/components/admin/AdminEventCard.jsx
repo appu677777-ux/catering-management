@@ -8,8 +8,7 @@ export default function AdminEventCard({ event, onDelete }) {
 
     const BASE_URL = import.meta.env.VITE_API_URL
         ? import.meta.env.VITE_API_URL.replace("/api", "")
-        : "https://catering-management-1.onrender.com/api";
-
+        : "https://catering-management-1.onrender.com";
     return (
         <div className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition">
 
