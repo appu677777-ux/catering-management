@@ -16,41 +16,106 @@ export default function CreateEvent() {
     menu: [{ name: "", price: "" }]
   });
 
+  const [rentalItems, setRentalItems] = useState([]);
   const [users, setUsers] = useState([]);
+  const [files, setFiles] = useState([]);
 
+  // fetch users
   useEffect(() => {
     API.get("/auth/users")
       .then(res => setUsers(res.data))
-      .catch(err => console.log(err));
+      .catch(console.error);
   }, []);
 
+  // input change
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // menu change
   const handleMenuChange = (index, field, value) => {
-    const updatedMenu = [...form.menu];
-    updatedMenu[index][field] = value;
-    setForm({ ...form, menu: updatedMenu });
+    const updated = [...form.menu];
+    updated[index][field] = value;
+    setForm(prev => ({ ...prev, menu: updated }));
   };
 
+  // add menu
   const addMenuItem = () => {
-    setForm({
-      ...form,
-      menu: [...form.menu, { name: "", price: "" }]
-    });
+    setForm(prev => ({
+      ...prev,
+      menu: [...prev.menu, { name: "", price: "" }]
+    }));
+  };
+
+  // add rental item
+  const addItem = () => {
+    setRentalItems(prev => [
+      ...prev,
+      { name: "", quantity: 1, image: null }
+    ]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await API.post("/events", form);
-      alert("Event Created!");
+      const formData = new FormData();
+
+      // =====================
+      // BASIC DATA
+      // =====================
+      formData.append("date", form.date);
+      formData.append("title", form.title);
+      formData.append("type", form.type);
+      formData.append("location", form.location);
+      formData.append("totalPeople", Number(form.totalPeople));
+      formData.append("totalCost", Number(form.totalCost));
+
+      // =====================
+      // MENU
+      // =====================
+      formData.append("menu", JSON.stringify(form.menu));
+
+      // =====================
+      // RENTAL ITEMS (NO IMAGE HERE)
+      // =====================
+      formData.append("rentalItems", JSON.stringify(rentalItems));
+
+      // =====================
+      // CAPTAINS & STAFF
+      // =====================
+      form.captains.forEach(id => formData.append("captains", id));
+      form.staff.forEach(id => formData.append("staff", id));
+
+      // =====================
+      // EVENT IMAGES
+      // =====================
+      files.forEach(file => {
+        formData.append("eventImages", file);
+      });
+
+      // =====================
+      // RENTAL IMAGES
+      // =====================
+      rentalItems.forEach(item => {
+        if (item.image) {
+          formData.append("rentalImages", item.image);
+        }
+      });
+
+      // =====================
+      // API CALL
+      // =====================
+      await API.post("/events", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+
+      alert("Event Created ✅");
       navigate("/admin");
+
     } catch (err) {
       console.error(err);
-      alert("Error creating event");
+      alert("Error creating event ❌");
     }
   };
 
@@ -163,13 +228,141 @@ export default function CreateEvent() {
                 />
               </div>
             ))}
+            {/* 📸 IMAGE UPLOAD */}
+            <div>
+              <h4 className="font-semibold mb-2">Event Images</h4>
 
+              {/* Hidden Input */}
+              <input
+                type="file"
+                id="imageUpload"
+                multiple
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const selected = [...e.target.files];
+                  setFiles((prev) => [...prev, ...selected]); // append
+                }}
+              />
+
+
+
+              {/* Add Button */}
+              <label
+                htmlFor="imageUpload"
+                className="inline-block cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                + Add Images
+              </label>
+
+              {/* Preview Row */}
+              {files.length > 0 && (
+                <div className="flex gap-3 mt-4 overflow-x-auto">
+                  {files.map((file, i) => (
+                    <div key={i} className="relative">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        className="w-24 h-24 object-cover rounded-lg"
+                      />
+
+                      {/* ❌ Remove Button */}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFiles(files.filter((_, index) => index !== i))
+                        }
+                        className="absolute top-1 right-1 bg-black text-white text-xs px-1 rounded"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <button
               type="button"
               onClick={addMenuItem}
               className="text-blue-600 text-sm"
             >
               + Add Item
+            </button>
+          </div>
+
+
+          {/* ================= RENTAL ITEMS ================= */}
+          <div>
+            <h4 className="font-semibold mb-3">Rental Items</h4>
+
+            {rentalItems.map((item, i) => (
+              <div
+                key={i}
+                className="flex flex-col md:flex-row items-start gap-4 border p-3 rounded-lg mb-3 bg-gray-50"
+              >
+
+                {/* LEFT SIDE - IMAGE */}
+                <div className="w-full md:w-32">
+                  {item.image ? (
+                    <img
+                      src={URL.createObjectURL(item.image)}
+                      className="w-32 h-32 object-cover rounded-lg border"
+                    />
+                  ) : (
+                    <div className="w-32 h-32 flex items-center justify-center border rounded-lg text-gray-400">
+                      No Image
+                    </div>
+                  )}
+                </div>
+
+                {/* RIGHT SIDE - INPUTS */}
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                  <input
+                    placeholder="Item name"
+                    className="input"
+                    value={item.name}
+                    onChange={(e) => {
+                      const updated = [...rentalItems];
+                      updated[i].name = e.target.value;
+                      setRentalItems(updated);
+                    }}
+                  />
+
+                  <input
+                    type="number"
+                    placeholder="Quantity"
+                    className="input"
+                    value={item.quantity}
+                    onChange={(e) => {
+                      const updated = [...rentalItems];
+                      updated[i].quantity = e.target.value;
+                      setRentalItems(updated);
+                    }}
+                  />
+
+                  {/* FILE INPUT */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="col-span-2"
+                    onChange={(e) => {
+                      const updated = [...rentalItems];
+                      updated[i].image = e.target.files[0];
+                      setRentalItems(updated);
+                    }}
+                  />
+
+                </div>
+              </div>
+            ))}
+
+            {/* ADD BUTTON */}
+            <button
+              type="button"
+              onClick={addItem}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+              + Add Rental Item
             </button>
           </div>
 

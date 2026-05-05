@@ -14,7 +14,11 @@ const eventSchema = new mongoose.Schema({
 
   location: String,
 
-  date: Date,
+  date: {
+    type: Date,
+    required: true,
+    default: Date.now
+  },
 
   totalPeople: Number,
 
@@ -40,10 +44,55 @@ const eventSchema = new mongoose.Schema({
   ],
 
   totalCost: Number,
+  images: [String],
+  imageURLs: [String],
 
   costDistribution: {
-    captainShare: Number,
-    staffShare: Number
+    captain: {
+      share: {
+        type: Number,
+        default: 800
+      },
+      bonus: {
+        type: Number,
+        default: 0
+      },
+      fine: {
+        type: Number,
+        default: 0
+      },
+      amountReceived: {
+        type: Number,
+        default: 0
+      },
+      due: {
+        type: Number,
+        default: 800
+      }
+    },
+
+    staff: {
+      share: {
+        type: Number,
+        default: 450
+      },
+      bonus: {
+        type: Number,
+        default: 0
+      },
+      fine: {
+        type: Number,
+        default: 0
+      },
+      amountReceived: {
+        type: Number,
+        default: 0
+      },
+      due: {
+        type: Number,
+        default: 450
+      }
+    }
   },
 
   status: {
@@ -52,9 +101,28 @@ const eventSchema = new mongoose.Schema({
     default: "pending"
   },
   earnings: {
-  perCaptain: Number,
-  perStaff: Number
-},
+    perCaptain: Number,
+    perStaff: Number
+  },
+  rentalItems: [
+    {
+      name: String,
+      quantity: Number,
+      image: String,
+
+      deliveryStatus: {
+        type: String,
+        enum: ["pending", "delivered"],
+        default: "pending"
+      },
+
+      returnStatus: {
+        type: String,
+        enum: ["pending", "returned"],
+        default: "pending"
+      }
+    }
+  ]
 
 }, { timestamps: true });
 

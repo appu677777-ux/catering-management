@@ -1,86 +1,82 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./context/AuthContext";
 
+// Pages
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import CaptainDashboard from "./pages/captain/CaptainDashboard";
 import UserDashboard from "./pages/user/UserDashboard";
-import ProtectedRoute from "./routes/ProtectedRoute";
+
 import CreateEvent from "./pages/admin/CreateEvent";
 import EditEvent from "./pages/admin/EditEvent";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminEventDetails from "./pages/admin/AdminEventDetails";
+import AdminPaymentPage from "./pages/admin/AdminPaymentPage";
+import AdminPaymentDetails from "./components/admin/AdminPaymentDetails";
 
+import CaptainPaymentPage from "./pages/captain/CaptainPaymentPage";
+
+// Components
+import ProtectedRoute from "./routes/ProtectedRoute";
+import Preloader from "./components/Preloader";
 
 export default function AppRoutes() {
-    const { user } = useContext(AuthContext);
-    const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        if (user) {
-            if (user.role === "admin") navigate("/admin");
-            if (user.role === "captain") navigate("/captain");
-            if (user.role === "user") navigate("/user");
-        }
-    }, [user]);
+  // 🔄 Preloader
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
-    return (
-        <Routes>
-            <Route path="/" element={<Login />} />
-            <Route
-  path="/register"
-  element={
-    <ProtectedRoute allowedRoles={["admin"]}>
-      <Register />
-    </ProtectedRoute>
-  }
-/>
+  // 🔀 Auto Redirect by Role
+  useEffect(() => {
+    if (!user) return;
 
-            <Route
-                path="/admin"
-                element={
-                    <ProtectedRoute allowedRoles={["admin"]}>
-                        <AdminDashboard />
-                    </ProtectedRoute>
-                }
-            />
+    const roleRoutes = {
+      admin: "/admin",
+      captain: "/captain",
+      user: "/user"
+    };
 
-            <Route
-                path="/captain"
-                element={
-                    <ProtectedRoute allowedRoles={["captain"]}>
-                        <CaptainDashboard />
-                    </ProtectedRoute>
-                }
-            />
+    navigate(roleRoutes[user.role] || "/");
+  }, [user]);
 
-            <Route
-                path="/user"
-                element={
-                    <ProtectedRoute allowedRoles={["user"]}>
-                        <UserDashboard />
-                    </ProtectedRoute>
-                }
-            />
+  // 🔐 Reusable Protected Wrapper
+  const protect = (roles, component) => (
+    isLoading
+      ? <Preloader />
+      : <ProtectedRoute allowedRoles={roles}>{component}</ProtectedRoute>
+  );
 
-            <Route
-                path="/admin/create-event"
-                element={
-                    <ProtectedRoute allowedRoles={["admin"]}>
-                        <CreateEvent />
-                    </ProtectedRoute>
-                }
-            />
+  return (
+    <Routes>
 
-            <Route
-                path="/admin/edit-event/:id"
-                element={
-                    <ProtectedRoute allowedRoles={["admin"]}>
-                        <EditEvent />
-                    </ProtectedRoute>
-                }
-            />
-            
-        </Routes>
-    );
+      {/* PUBLIC */}
+      <Route path="/" element={<Login />} />
+
+      {/* ADMIN ROUTES */}
+      <Route path="/register" element={protect(["admin"], <Register />)} />
+      <Route path="/admin" element={protect(["admin"], <AdminDashboard />)} />
+      <Route path="/admin/create-event" element={protect(["admin"], <CreateEvent />)} />
+      <Route path="/admin/edit-event/:id" element={protect(["admin"], <EditEvent />)} />
+      <Route path="/admin/users" element={protect(["admin"], <AdminUsers />)} />
+      <Route path="/admin/event/:id" element={protect(["admin"], <AdminEventDetails />)} />
+      <Route path="/admin/payments" element={protect(["admin"], <AdminPaymentPage />)} />
+      <Route path="/admin/payments/:id" element={protect(["admin"], <AdminPaymentDetails />)} />
+
+      {/* CAPTAIN ROUTES */}
+      <Route path="/captain" element={protect(["captain"], <CaptainDashboard />)} />
+      <Route path="/captain/payments" element={protect(["captain"], <CaptainPaymentPage />)} />
+
+      {/* USER ROUTES */}
+      <Route path="/user" element={protect(["user"], <UserDashboard />)} />
+
+    </Routes>
+  );
 }

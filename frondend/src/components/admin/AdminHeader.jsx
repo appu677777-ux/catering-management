@@ -1,63 +1,86 @@
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { FaUser, FaPlus, FaUserPlus } from "react-icons/fa";
+import { FaUser, FaPlus, FaUserPlus, FaSignOutAlt } from "react-icons/fa";
 
 export default function AdminHeader() {
   const { logout, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white shadow-md px-4 sm:px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+    <header className="bg-white shadow-sm border-b px-4 sm:px-6 py-3 flex items-center justify-between">
 
-      {/* Title */}
-      <h2
+      
+      {/* LEFT: LOGO + BRAND */}
+      <div
         onClick={() => navigate("/admin")}
-        className="text-xl font-bold text-gray-800 cursor-pointer"
+        className="flex items-center gap-3 cursor-pointer"
       >
-        🍽️ Catering Admin
-      </h2>
+        {/* LOGO */}
+        <img
+          src="/dosth_logo.png" // 👈 place your logo in public folder
+          alt="logo"
+          className="w-8 h-8 object-contain"
+        />
 
-      {/* Right Section */}
-      <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
+        {/* TEXT */}
+        <div>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+            Dosth Team
+          </h2>
+          <p className="text-xs text-gray-500 hidden sm:block">
+            Admin Dashboard
+          </p>
+        </div>
+      </div>
 
-        {/* User */}
-        <span className="text-gray-600 text-sm sm:text-base flex items-center gap-1">
-          <FaUser /> {user?.name}
-        </span>
+      {/* RIGHT: ACTIONS */}
+      <div className="flex items-center gap-3 sm:gap-4">
 
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        {/* USER */}
+        <div className="hidden sm:flex items-center gap-2 text-gray-600 text-sm">
+          <FaUser className="text-gray-500" />
+          <span className="truncate max-w-[100px]">
+            {user?.name}
+          </span>
+        </div>
 
-          {/* Create Event */}
+        {/* ICON BUTTONS */}
+        <div className="flex items-center gap-2">
+
+          {/* ADD EVENT */}
           <button
             onClick={() => navigate("/admin/create-event")}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition text-sm"
+            className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+            title="Create Event"
           >
-            <FaPlus /> Event
+            <FaPlus />
           </button>
 
-          {/* Create User */}
+          {/* ADD USER */}
           <button
             onClick={() => navigate("/register")}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition text-sm"
+            className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition"
+            title="Add User"
           >
-            <FaUserPlus /> User
+            <FaUserPlus />
           </button>
 
-          {/* Logout */}
+          {/* LOGOUT */}
           <button
             onClick={() => {
               logout();
               navigate("/");
             }}
-            className="w-full sm:w-auto bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition text-sm"
+            className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+            title="Logout"
           >
-            Logout
+            <FaSignOutAlt />
           </button>
 
         </div>
+
       </div>
-    </div>
+    </header>
   );
 }

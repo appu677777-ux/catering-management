@@ -33,3 +33,30 @@
   @apply w-full border border-gray-300 p-3 rounded-lg 
          focus:outline-none focus:ring-2 focus:ring-blue-400;
 }
+
+
+
+/* 🔥 SATOSHI FONT */
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/src/assets/fonts/Satoshi-Regular.woff2") format("woff2");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/src/assets/fonts/Satoshi-Medium.woff2") format("woff2");
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/src/assets/fonts/Satoshi-Bold.woff2") format("woff2");
+  font-weight: 700;
+}
+
+body {
+  font-family: "Satoshi", sans-serif;
+}
+

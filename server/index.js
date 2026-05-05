@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose"); // ✅ FIX ADDED
+const mongoose = require("mongoose");
 
 const app = express();
 
@@ -17,7 +17,10 @@ app.use(
   })
 );
 app.use(cors());
+
+// 🔥 ADD THIS (VERY IMPORTANT)
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // ✅ MISSING LINE
 
 // Test route
 app.get("/", (req, res) => {
@@ -30,7 +33,8 @@ const eventRoutes = require("./routes/eventRoutes");
 app.use("/api/events", eventRoutes);
 app.use("/api/auth", route);
 
-
+// serve uploads
+app.use("/uploads", express.static("uploads"));
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB Connected"))

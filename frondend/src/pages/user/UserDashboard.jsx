@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../../services/api";
 import UserHeader from "../../components/user/UserHeader";
+import UserEventCard from "../../components/user/UserEventCard";
 
 export default function UserDashboard() {
   const [events, setEvents] = useState([]);
@@ -41,32 +42,9 @@ export default function UserDashboard() {
           <p className="text-gray-500">No events assigned</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-
             {events.map(e => (
-              <div
-                key={e.eventId}
-                className="bg-white shadow-md rounded-xl p-5 hover:shadow-lg transition"
-              >
-                <h3 className="text-lg font-bold text-gray-800">
-                  {e.title}
-                </h3>
-
-                <p className="text-gray-500 text-sm">📍 {e.location}</p>
-
-                <p className="text-green-600 font-semibold mt-2">
-                  ₹{e.earning}
-                </p>
-
-                <span className={`text-xs px-2 py-1 rounded ${
-                  e.status === "pending"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-green-100 text-green-700"
-                }`}>
-                  {e.status}
-                </span>
-              </div>
+              <UserEventCard key={e.eventId || e._id} event={e} />
             ))}
-
           </div>
         )}
       </div>

@@ -10,7 +10,8 @@ export default function EditEvent() {
     title: "",
     location: "",
     totalPeople: "",
-    totalCost: ""
+    totalCost: "",
+    status: "pending"   // ✅ ADD THIS
   });
 
   const [loading, setLoading] = useState(true);
@@ -25,7 +26,8 @@ export default function EditEvent() {
             title: event.title || "",
             location: event.location || "",
             totalPeople: event.totalPeople || "",
-            totalCost: event.totalCost || ""
+            totalCost: event.totalCost || "",
+            status: event.status || "pending"   // ✅ ADD THIS
           });
         }
         setLoading(false);
@@ -65,9 +67,9 @@ export default function EditEvent() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4">
-      
+
       <div className="bg-white shadow-xl rounded-xl p-6 w-full max-w-xl">
-        
+
         <h2 className="text-2xl font-bold mb-6 text-gray-800">
           Edit Event ✏️
         </h2>
@@ -105,6 +107,21 @@ export default function EditEvent() {
             className="input"
             onChange={handleChange}
           />
+          <select
+            name="status"
+            value={form.status}
+            onChange={handleChange}
+            className={`w-full border border-gray-300 p-3 rounded-lg focus:outline-none ${form.status === "pending"
+                ? "bg-yellow-100"
+                : form.status === "ongoing"
+                  ? "bg-blue-100"
+                  : "bg-green-100"
+              }`}
+          >
+            <option value="pending">Pending</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="completed">Completed</option>
+          </select>
 
           <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
             Update Event
