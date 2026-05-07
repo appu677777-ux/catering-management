@@ -6,7 +6,8 @@ export default function UserEventCard({ event }) {
 
   const BASE_URL = import.meta.env.VITE_API_URL
     ? import.meta.env.VITE_API_URL.replace("/api", "")
-    : "http://localhost:5000";
+    //: "http://localhost:5000";
+    : "https://catering-management-1.onrender.com";
 
   return (
     <div className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition">
