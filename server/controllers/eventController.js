@@ -274,12 +274,28 @@ exports.getUserDashboard = async (req, res) => {
 
     // Add earnings info
     const data = events.map(event => ({
+
       eventId: event._id,
+
       title: event.title,
+
       location: event.location,
+
       date: event.date,
+
+      // ✅ ADD TIME
+      time: event.time,
+
+      // ✅ ADD IMAGES
+      images: event.images,
+
+      // ✅ ADD PEOPLE
+      totalPeople: event.totalPeople,
+
       earning: event.earnings?.perStaff || 0,
+
       status: event.status
+
     }));
 
     res.json(data);
@@ -491,9 +507,22 @@ exports.getAvailableEvents = async (req, res) => {
     const role = req.user.role;
 
     // 🔥 GET UPCOMING EVENTS
+    const today = new Date();
+
+    // ✅ START OF TODAY
+    today.setHours(0, 0, 0, 0);
+
     const events = await Event.find({
-      date: { $gte: new Date() },
-      status: "pending"
+
+      // ✅ today + future
+      date: {
+        $gte: today
+      },
+
+      status: {
+        $in: ["pending", "ongoing"]
+      }
+
     })
       .populate("captains", "name")
       .populate("staff", "name")
@@ -559,6 +588,8 @@ exports.getAvailableEvents = async (req, res) => {
       type: event.type,
 
       date: event.date,
+
+      time: event.time,
 
       status: event.status,
 

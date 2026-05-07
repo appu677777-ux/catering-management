@@ -7,7 +7,7 @@ export default function UserEventCard({ event }) {
   const BASE_URL = import.meta.env.VITE_API_URL
     ? import.meta.env.VITE_API_URL.replace("/api", "")
     //: "http://localhost:5000";
-    : "https://catering-management-1.onrender.com";
+      : "https://catering-management-1.onrender.com";
 
   return (
     <div className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition">
@@ -71,30 +71,25 @@ export default function UserEventCard({ event }) {
           ₹{event.earning || 0}
         </p>
 
-        {/* 👥 PEOPLE (optional) */}
-        {event.totalPeople && (
-          <p className="text-sm mt-1">
-            👥 {event.totalPeople} people
-          </p>
-        )}
+        {/* DATE */}
+        <p className="text-sm text-gray-500 mt-2">
+          📅{" "}
+          {
+            new Date(event.date)
+              .toLocaleDateString()
+          }
+        </p>
 
-        {/* 🍽️ MENU (optional preview) */}
-        {event.menu?.length > 0 && (
-          <div className="mt-2 text-xs space-y-1 max-h-20 overflow-y-auto">
-            {event.menu.slice(0, 3).map((item, i) => (
-              <div
-                key={i}
-                className="flex justify-between bg-gray-100 px-2 py-1 rounded"
-              >
-                <span>{item.name}</span>
-                <span>₹{item.price}</span>
-              </div>
-            ))}
-            {event.menu.length > 3 && (
-              <p className="text-gray-400">+ more</p>
-            )}
-          </div>
-        )}
+        {/* TIME */}
+        <p className="text-sm text-gray-500 mt-1">
+
+          ⏰{" "}
+
+          {event.time?.start
+            ? `${event.time.start} - ${event.time.end}`
+            : "Time not added"}
+
+        </p>
 
 
       </div>

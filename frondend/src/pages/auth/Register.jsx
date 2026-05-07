@@ -46,7 +46,7 @@ export default function Register() {
 
           {/* Email */}
           <input
-            type="email"
+            type="text"
             placeholder="Email"
             className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
             onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -67,6 +67,7 @@ export default function Register() {
           >
             <option value="user">User</option>
             <option value="captain">Captain</option>
+            {/* <option value="admin">Admin</option> */}
           </select>
 
           {/* Button */}

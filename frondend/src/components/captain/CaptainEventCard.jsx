@@ -72,7 +72,26 @@ export default function CaptainEventCard({ event, updateDelivery, updateReturn }
           Payment: ₹{event.earnings?.perCaptain || 0}
         </p>
 
-        
+        {/* DATE */}
+        <p className="text-sm text-gray-500 mt-2">
+          📅{" "}
+          {
+            new Date(event.date)
+              .toLocaleDateString()
+          }
+        </p>
+
+        <p className="text-sm text-gray-500 mt-2">
+
+          ⏰{" "}
+
+          {event.time?.start
+            ? `${event.time.start} - ${event.time.end}`
+            : "Time not added"}
+
+        </p>
+
+
 
         {/* 🍽️ MENU */}
         {event.menu && event.menu.length > 0 && (
@@ -86,7 +105,7 @@ export default function CaptainEventCard({ event, updateDelivery, updateReturn }
                   className="flex justify-between bg-gray-100 px-2 py-1 rounded text-xs"
                 >
                   <span>{item.name}</span>
-                  
+
                 </div>
               ))}
             </div>

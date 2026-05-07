@@ -11,7 +11,18 @@ export default function EditEvent() {
     location: "",
     totalPeople: "",
     totalCost: "",
-    status: "pending"   // ✅ ADD THIS
+    status: "pending",
+
+    // ✅ DATE
+    date: "",
+
+    // ✅ TIME
+    startTime: "",
+    endTime: "",
+
+    // ✅ SLOTS
+    captainSlot: "",
+    staffSlot: ""
   });
 
   const [loading, setLoading] = useState(true);
@@ -24,10 +35,33 @@ export default function EditEvent() {
         if (event) {
           setForm({
             title: event.title || "",
+
             location: event.location || "",
+
             totalPeople: event.totalPeople || "",
+
             totalCost: event.totalCost || "",
-            status: event.status || "pending"   // ✅ ADD THIS
+
+            status: event.status || "pending",
+
+            // ✅ DATE
+            date: event.date
+              ? new Date(event.date)
+                .toISOString()
+                .split("T")[0]
+              : "",
+
+            // ✅ TIME
+            startTime: event.time?.start || "",
+
+            endTime: event.time?.end || "",
+
+            // ✅ SLOT
+            captainSlot:
+              event.slotCount?.captainSlot || "",
+
+            staffSlot:
+              event.slotCount?.staffSlot || ""
           });
         }
         setLoading(false);
@@ -48,7 +82,34 @@ export default function EditEvent() {
     e.preventDefault();
 
     try {
-      await API.put(`/events/${id}`, form);
+      await API.put(`/events/${id}`, {
+
+        title: form.title,
+
+        location: form.location,
+
+        totalPeople: Number(form.totalPeople),
+
+        totalCost: Number(form.totalCost),
+
+        status: form.status,
+
+        // ✅ DATE
+        date: form.date,
+
+        // ✅ TIME
+        time: {
+          start: form.startTime,
+          end: form.endTime
+        },
+
+        // ✅ SLOT COUNT
+        slotCount: {
+          captainSlot: Number(form.captainSlot),
+          staffSlot: Number(form.staffSlot)
+        }
+
+      });
       alert("Event Updated ✅");
       navigate("/admin");
     } catch (err) {
@@ -107,15 +168,68 @@ export default function EditEvent() {
             className="input"
             onChange={handleChange}
           />
+          <input
+            type="date"
+            name="date"
+            value={form.date}
+            className="input"
+            onChange={handleChange}
+          />
+          <div className="grid grid-cols-2 gap-4">
+
+            {/* START */}
+            <input
+              type="time"
+              name="startTime"
+              value={form.startTime}
+              className="input"
+              onChange={handleChange}
+            />
+
+            {/* END */}
+            <input
+              type="time"
+              name="endTime"
+              value={form.endTime}
+              className="input"
+              onChange={handleChange}
+            />
+
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+
+            {/* CAPTAIN SLOT */}
+            <input
+              type="number"
+              name="captainSlot"
+              value={form.captainSlot}
+              placeholder="Captain Slots"
+              className="input"
+              onChange={handleChange}
+            />
+
+            {/* STAFF SLOT */}
+            <input
+              type="number"
+              name="staffSlot"
+              value={form.staffSlot}
+              placeholder="Staff Slots"
+              className="input"
+              onChange={handleChange}
+            />
+
+          </div>
+
           <select
             name="status"
             value={form.status}
             onChange={handleChange}
             className={`w-full border border-gray-300 p-3 rounded-lg focus:outline-none ${form.status === "pending"
-                ? "bg-yellow-100"
-                : form.status === "ongoing"
-                  ? "bg-blue-100"
-                  : "bg-green-100"
+              ? "bg-yellow-100"
+              : form.status === "ongoing"
+                ? "bg-blue-100"
+                : "bg-green-100"
               }`}
           >
             <option value="pending">Pending</option>

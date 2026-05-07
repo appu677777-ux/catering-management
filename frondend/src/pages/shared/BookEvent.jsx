@@ -15,6 +15,10 @@ export default function BookEvent() {
   const [events, setEvents] = useState([]);
   const [bookingId, setBookingId] = useState(null);
 
+  // ✅ GET USER
+  const user = JSON.parse(localStorage.getItem("user"));
+  const role = user?.role;
+
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -45,12 +49,16 @@ export default function BookEvent() {
       fetchEvents();
 
     } catch (err) {
+
       alert(
         err.response?.data?.error ||
         "Booking failed"
       );
+
     } finally {
+
       setBookingId(null);
+
     }
   };
 
@@ -75,9 +83,11 @@ export default function BookEvent() {
 
       {/* EMPTY */}
       {events.length === 0 ? (
+
         <div className="bg-white rounded-xl shadow p-6 text-center text-gray-500">
           No available events
         </div>
+
       ) : (
 
         <div className="space-y-4">
@@ -102,6 +112,7 @@ export default function BookEvent() {
                 {/* TOP */}
                 <div className="flex justify-between gap-4">
 
+                  {/* LEFT */}
                   <div className="flex-1">
 
                     {/* TITLE */}
@@ -121,104 +132,79 @@ export default function BookEvent() {
                       <span>
                         {
                           new Date(event.date)
-                            .toLocaleString()
+                            .toLocaleDateString()
                         }
                       </span>
                     </div>
 
+                    <p className="text-sm text-gray-500 mt-2">
+
+                      ⏰{" "}
+
+                      {event.time?.start
+                        ? `${event.time.start} - ${event.time.end}`
+                        : "Time not added"}
+
+                    </p>
+
+                    {/* EVENT TYPE */}
+                    <p className="text-sm text-gray-500 mt-1">
+                      🎉 Type:
+                      {" "}
+                      {event.type}
+                    </p>
+
+                    {/* TOTAL PEOPLE */}
+                    <p className="text-sm text-gray-500 mt-1">
+                      👥 Guests:
+                      {" "}
+                      {event.totalPeople}
+                    </p>
+
                   </div>
 
-                  {/* SLOT INFO */}
+                  {/* RIGHT SLOT INFO */}
                   <div className="text-right">
 
-                    <div className="flex items-center justify-end gap-2 text-sm text-blue-600">
-                      <FaUsers />
+                    {/* CAPTAIN */}
+                    {role === "captain" &&
+                      captainRemaining < 5 && (
+                        <div className="flex items-center justify-end gap-2 text-sm text-blue-600">
 
-                      <span>
-                        C:
-                        {" "}
-                        {captainRemaining}
-                        {" "}
-                        left
-                      </span>
-                    </div>
+                          <FaUsers />
 
-                    <div className="mt-2 text-sm text-green-600">
-                      S:
-                      {" "}
-                      {staffRemaining}
-                      {" "}
-                      left
-                    </div>
+                          <span>
+                            Only{" "}
+                            {captainRemaining}
+                            {" "}
+                            Slots Left
+                          </span>
 
-                  </div>
+                        </div>
+                      )}
 
-                </div>
+                    {/* STAFF */}
+                    {role === "user" &&
+                      staffRemaining < 5 && (
+                        <div className="flex items-center justify-end gap-2 text-sm text-green-600">
 
-                {/* SLOT BARS */}
-                <div className="mt-4 space-y-3">
+                          <FaUsers />
 
-                  {/* CAPTAIN */}
-                  <div>
+                          <span>
+                            Only{" "}
+                            {staffRemaining}
+                            {" "}
+                            Slots Left
+                          </span>
 
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>Captain Slots</span>
-
-                      <span>
-                        {event.captains.length}/
-                        {event.slotCount?.captainSlot}
-                      </span>
-                    </div>
-
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-500 h-2 rounded-full"
-                        style={{
-                          width: `${
-                            event.slotCount?.captainSlot
-                              ? (
-                                  event.captains.length /
-                                  event.slotCount.captainSlot
-                                ) * 100
-                              : 0
-                          }%`
-                        }}
-                      />
-                    </div>
-
-                  </div>
-
-                  {/* STAFF */}
-                  <div>
-
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>Staff Slots</span>
-
-                      <span>
-                        {event.staff.length}/
-                        {event.slotCount?.staffSlot}
-                      </span>
-                    </div>
-
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-green-500 h-2 rounded-full"
-                        style={{
-                          width: `${
-                            event.slotCount?.staffSlot
-                              ? (
-                                  event.staff.length /
-                                  event.slotCount.staffSlot
-                                ) * 100
-                              : 0
-                          }%`
-                        }}
-                      />
-                    </div>
+                        </div>
+                      )}
 
                   </div>
 
                 </div>
+
+
 
                 {/* BOOK BUTTON */}
                 <button
