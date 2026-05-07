@@ -1,11 +1,10 @@
 import { NavLink } from "react-router-dom";
 import {
   FaCalendarAlt,
-  FaMoneyBill,
   FaClipboardList
 } from "react-icons/fa";
 
-export default function CaptainBottomNavBar() {
+export default function UserBottomNavBar() {
 
   const baseStyle =
     "flex flex-col items-center justify-center flex-1 py-2 text-xs transition-all duration-200";
@@ -23,7 +22,7 @@ export default function CaptainBottomNavBar() {
 
         {/* EVENTS */}
         <NavLink
-          to="/captain"
+          to="/user"
           className={({ isActive }) =>
             `${baseStyle} ${
               isActive ? activeStyle : inactiveStyle
@@ -36,7 +35,7 @@ export default function CaptainBottomNavBar() {
 
         {/* BOOK EVENTS */}
         <NavLink
-          to="/captain/book-events"
+          to="/user/book-events"
           className={({ isActive }) =>
             `${baseStyle} ${
               isActive ? activeStyle : inactiveStyle
@@ -45,19 +44,6 @@ export default function CaptainBottomNavBar() {
         >
           <FaClipboardList size={20} />
           <span className="mt-1">Booking</span>
-        </NavLink>
-
-        {/* PAYMENTS */}
-        <NavLink
-          to="/captain/payments"
-          className={({ isActive }) =>
-            `${baseStyle} ${
-              isActive ? activeStyle : inactiveStyle
-            }`
-          }
-        >
-          <FaMoneyBill size={20} />
-          <span className="mt-1">Payments</span>
         </NavLink>
 
       </div>

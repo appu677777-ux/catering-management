@@ -17,7 +17,17 @@ const eventSchema = new mongoose.Schema({
   date: {
     type: Date,
     required: true,
-    default: Date.now
+  },
+  time: {
+    start: {
+      type: String,
+      required: true
+    },
+
+    end: {
+      type: String,
+      required: true
+    }
   },
 
   totalPeople: Number,
@@ -92,6 +102,15 @@ const eventSchema = new mongoose.Schema({
         type: Number,
         default: 450
       }
+    }
+  },
+  slotCount: {
+    captainSlot: {
+      type: Number,
+    },
+
+    staffSlot: {
+      type: Number,
     }
   },
 

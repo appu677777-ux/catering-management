@@ -40,6 +40,18 @@ exports.createEvent = async (req, res) => {
       mongoose.Types.ObjectId.isValid(id)
     );
 
+    if (captainsArray.length > Number(data.captainSlot || 0)) {
+      return res.status(400).json({
+        error: "Captain slot limit exceeded"
+      });
+    }
+
+    if (staffArray.length > Number(data.staffSlot || 0)) {
+      return res.status(400).json({
+        error: "Staff slot limit exceeded"
+      });
+    }
+
     // =====================
     // SAFE MENU
     // =====================
@@ -136,6 +148,10 @@ exports.createEvent = async (req, res) => {
         due: staffShare
       }
     };
+    const slotCount = {
+      captainSlot: null,
+      staffSlot: null
+    }
 
     // =====================
     // CREATE EVENT
@@ -144,6 +160,11 @@ exports.createEvent = async (req, res) => {
       title: data.title,
       type: data.type,
       location: data.location,
+      date: data.date,
+      time: {
+        start: data.startTime,
+        end: data.endTime
+      },
       totalPeople: Number(data.totalPeople || 0),
       totalCost,
       menu: parsedMenu,
@@ -155,6 +176,10 @@ exports.createEvent = async (req, res) => {
       costDistribution: {
         captainShare,
         staffShare
+      },
+      slotCount: {
+        captainSlot: Number(data.captainSlot || 0),
+        staffSlot: Number(data.staffSlot || 0)
       },
       earnings: {
         perCaptain,
@@ -362,5 +387,211 @@ exports.updateEventPayment = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: err.message });
+  }
+};
+
+exports.bookEvent = async (req, res) => {
+  try {
+
+    const event = await Event.findById(req.params.id);
+
+    const userId = req.user.id;
+    const role = req.user.role;
+
+    if (role === "captain") {
+
+      if (
+        event.captains.length >=
+        event.slotCount.captainSlot
+      ) {
+        return res.status(400).json({
+          error: "Captain slots full"
+        });
+      }
+
+      if (!event.captains.includes(userId)) {
+        event.captains.push(userId);
+      }
+    }
+
+    if (role === "user") {
+
+      if (
+        event.staff.length >=
+        event.slotCount.staffSlot
+      ) {
+        return res.status(400).json({
+          error: "Staff slots full"
+        });
+      }
+
+      if (!event.staff.includes(userId)) {
+        event.staff.push(userId);
+      }
+    }
+
+    await event.save();
+
+    res.json({
+      message: "Booked successfully"
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      error: err.message
+    });
+  }
+};
+
+exports.removeUserFromEvent = async (req, res) => {
+  try {
+
+    const { userId, role } = req.body;
+
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        error: "Event not found"
+      });
+    }
+
+    if (role === "captain") {
+
+      event.captains =
+        event.captains.filter(
+          id => id.toString() !== userId
+        );
+    }
+
+    if (role === "staff") {
+
+      event.staff =
+        event.staff.filter(
+          id => id.toString() !== userId
+        );
+    }
+
+    await event.save();
+
+    res.json({
+      message: "User removed successfully"
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      error: err.message
+    });
+  }
+};
+
+exports.getAvailableEvents = async (req, res) => {
+  try {
+
+    const role = req.user.role;
+
+    // 🔥 GET UPCOMING EVENTS
+    const events = await Event.find({
+      date: { $gte: new Date() },
+      status: "pending"
+    })
+      .populate("captains", "name")
+      .populate("staff", "name")
+      .sort({ date: 1 });
+
+    // 🔥 FILTER AVAILABLE EVENTS
+    const availableEvents = events.filter(event => {
+
+      const captainUsed =
+        event.captains?.length || 0;
+
+      const captainTotal =
+        event.slotCount?.captainSlot || 0;
+
+      const staffUsed =
+        event.staff?.length || 0;
+
+      const staffTotal =
+        event.slotCount?.staffSlot || 0;
+
+      // ✅ CAPTAIN VIEW
+      if (role === "captain") {
+
+        // already booked
+        const alreadyBooked =
+          event.captains.some(c =>
+            c._id.toString() === req.user.id
+          );
+
+        return (
+          captainUsed < captainTotal &&
+          !alreadyBooked
+        );
+      }
+
+      // ✅ STAFF VIEW
+      if (role === "user") {
+
+        // already booked
+        const alreadyBooked =
+          event.staff.some(s =>
+            s._id.toString() === req.user.id
+          );
+
+        return (
+          staffUsed < staffTotal &&
+          !alreadyBooked
+        );
+      }
+
+      return false;
+    });
+
+    // 🔥 FORMAT RESPONSE
+    const formatted = availableEvents.map(event => ({
+
+      _id: event._id,
+
+      title: event.title,
+
+      location: event.location,
+
+      type: event.type,
+
+      date: event.date,
+
+      status: event.status,
+
+      images: event.images,
+
+      totalPeople: event.totalPeople,
+
+      captains: event.captains,
+
+      staff: event.staff,
+
+      slotCount: event.slotCount,
+
+      availableSlots: {
+        captains:
+          (event.slotCount?.captainSlot || 0) -
+          (event.captains?.length || 0),
+
+        staff:
+          (event.slotCount?.staffSlot || 0) -
+          (event.staff?.length || 0)
+      }
+
+    }));
+
+    res.json(formatted);
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      error: err.message
+    });
   }
 };

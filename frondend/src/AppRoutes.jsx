@@ -19,6 +19,8 @@ import AdminPaymentDetails from "./components/admin/AdminPaymentDetails";
 
 import CaptainPaymentPage from "./pages/captain/CaptainPaymentPage";
 
+import BookEvent from "./pages/shared/BookEvent";
+
 // Components
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Preloader from "./components/Preloader";
@@ -73,6 +75,22 @@ export default function AppRoutes() {
       {/* CAPTAIN ROUTES */}
       <Route path="/captain" element={protect(["captain"], <CaptainDashboard />)} />
       <Route path="/captain/payments" element={protect(["captain"], <CaptainPaymentPage />)} />
+      <Route
+        path="/captain/book-events"
+        element={
+          <ProtectedRoute allowedRoles={["captain"]}>
+            <BookEvent />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/book-events"
+        element={
+          <ProtectedRoute allowedRoles={["user"]}>
+            <BookEvent />
+          </ProtectedRoute>
+        }
+      />
 
       {/* USER ROUTES */}
       <Route path="/user" element={protect(["user"], <UserDashboard />)} />

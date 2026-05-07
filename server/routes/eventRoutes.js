@@ -11,7 +11,10 @@ const {
   getUserDashboard,
   updateDeliveryStatus,
   updateReturnStatus,
-  updateEventPayment
+  updateEventPayment,
+  getAvailableEvents,
+  bookEvent,
+  removeUserFromEvent
 } = require("../controllers/eventController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -86,6 +89,28 @@ router.put("/:id/payment", ...protect("admin"), updateEventPayment);
 
 // GET ALL EVENTS
 router.get("/", authMiddleware, getEvents);
+
+//book events 
+router.get(
+  "/available",
+  authMiddleware,
+  roleMiddleware("captain", "user"),
+  getAvailableEvents
+);
+
+router.patch(
+  "/:id/book",
+  authMiddleware,
+  roleMiddleware("captain", "user"),
+  bookEvent
+);
+
+router.patch(
+  "/:id/remove-user",
+  authMiddleware,
+  roleMiddleware("admin"),
+  removeUserFromEvent
+);
 
 
 module.exports = router;

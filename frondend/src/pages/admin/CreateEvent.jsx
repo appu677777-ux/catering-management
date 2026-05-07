@@ -9,8 +9,13 @@ export default function CreateEvent() {
     title: "",
     type: "marriage",
     location: "",
+    date: "",
+    startTime: "",
+    endTime: "",
     totalPeople: "",
     totalCost: "",
+    captainSlot: "",
+    staffSlot: "",
     captains: [],
     staff: [],
     menu: [{ name: "", price: "" }]
@@ -65,11 +70,15 @@ export default function CreateEvent() {
       // BASIC DATA
       // =====================
       formData.append("date", form.date);
+      formData.append("startTime", form.startTime);
+      formData.append("endTime", form.endTime);
       formData.append("title", form.title);
       formData.append("type", form.type);
       formData.append("location", form.location);
       formData.append("totalPeople", Number(form.totalPeople));
       formData.append("totalCost", Number(form.totalCost));
+      formData.append("captainSlot", form.captainSlot);
+      formData.append("staffSlot", form.staffSlot);
 
       // =====================
       // MENU
@@ -160,15 +169,113 @@ export default function CreateEvent() {
             />
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            {/* DATE */}
+            <div>
+              <label className="block text-sm mb-1">
+                Event Date
+              </label>
+
+              <input
+                type="date"
+                name="date"
+                value={form.date}
+                onChange={handleChange}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+            </div>
+
+            {/* START */}
+            <div>
+              <label className="block text-sm mb-1">
+                Start Time
+              </label>
+
+              <input
+                type="time"
+                name="startTime"
+                value={form.startTime}
+                onChange={handleChange}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+            </div>
+
+            {/* END */}
+            <div>
+              <label className="block text-sm mb-1">
+                End Time
+              </label>
+
+              <input
+                type="time"
+                name="endTime"
+                value={form.endTime}
+                onChange={handleChange}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+            </div>
+
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+
+            {/* CAPTAIN SLOT */}
+            <div>
+              <label className="block text-sm mb-1">
+                Captain Slots
+              </label>
+
+              <input
+                type="number"
+                name="captainSlot"
+                value={form.captainSlot}
+                onChange={handleChange}
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="Enter captain slots"
+              />
+            </div>
+
+            {/* STAFF SLOT */}
+            <div>
+              <label className="block text-sm mb-1">
+                Staff Slots
+              </label>
+
+              <input
+                type="number"
+                name="staffSlot"
+                value={form.staffSlot}
+                onChange={handleChange}
+                className="w-full border rounded-lg px-3 py-2"
+                placeholder="Enter staff slots"
+              />
+            </div>
+
+          </div>
+
           {/* Captains */}
           <div>
             <h4 className="font-semibold mb-2">Select Captains</h4>
+            <p className="text-sm text-gray-500 mb-2">
+              {form.captains.length} / {form.captainSlot || 0} selected
+            </p>
             <div className="grid grid-cols-2 gap-2">
               {users.filter(u => u.role === "captain").map(u => (
                 <label key={u._id} className="flex items-center gap-2 bg-gray-100 p-2 rounded">
                   <input
                     type="checkbox"
                     onChange={(e) => {
+
+                      // ✅ ADD
+                      if (
+                        e.target.checked &&
+                        form.captains.length >= Number(form.captainSlot || 0)
+                      ) {
+                        alert("Captain slot limit reached");
+                        return;
+                      }
+
                       setForm({
                         ...form,
                         captains: e.target.checked
@@ -186,12 +293,25 @@ export default function CreateEvent() {
           {/* Staff */}
           <div>
             <h4 className="font-semibold mb-2">Select Staff</h4>
+            <p className="text-sm text-gray-500 mb-2">
+              {form.staff.length} / {form.staffSlot || 0} selected
+            </p>
             <div className="grid grid-cols-2 gap-2">
               {users.filter(u => u.role === "user").map(u => (
                 <label key={u._id} className="flex items-center gap-2 bg-gray-100 p-2 rounded">
                   <input
                     type="checkbox"
                     onChange={(e) => {
+
+                      // ✅ ADD
+                      if (
+                        e.target.checked &&
+                        form.staff.length >= Number(form.staffSlot || 0)
+                      ) {
+                        alert("Staff slot limit reached");
+                        return;
+                      }
+
                       setForm({
                         ...form,
                         staff: e.target.checked
@@ -205,6 +325,8 @@ export default function CreateEvent() {
               ))}
             </div>
           </div>
+
+
 
           {/* Menu */}
           <div>

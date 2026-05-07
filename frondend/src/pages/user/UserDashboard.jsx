@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../../services/api";
 import UserHeader from "../../components/user/UserHeader";
 import UserEventCard from "../../components/user/UserEventCard";
+import UserBottomNavBar from "../../components/user/UserBottomNavBar";
 
 export default function UserDashboard() {
   const [events, setEvents] = useState([]);
@@ -48,6 +49,9 @@ export default function UserDashboard() {
           </div>
         )}
       </div>
+
+      <UserBottomNavBar />
+      <div className="pb-20"></div>
     </div>
   );
 }
